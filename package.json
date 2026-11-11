@@ -1,0 +1,17 @@
+{
+  "name": "hookflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Webhook management and delivery platform",
+  "workspaces": ["apps/*"],
+  "scripts": {
+    "infra": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "db:migrate": "npm run db:deploy -w @hookflow/api",
+    "dev:api": "npm run dev -w @hookflow/api",
+    "dev:web": "npm run dev -w @hookflow/web",
+    "receiver": "npm run receiver -w @hookflow/api",
+    "build": "npm run build -w @hookflow/api && npm run build -w @hookflow/web",
+    "test": "npm test -w @hookflow/api"
+  }
+}

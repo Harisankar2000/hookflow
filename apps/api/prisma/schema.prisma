@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EndpointStatus {
+  ACTIVE
+  PAUSED
+  DISABLED
+}
+
+enum DeliveryStatus {
+  PENDING
+  RETRYING
+  SUCCEEDED
+  DEAD
+}
+
+model Tenant {
+  id           String     @id @default(uuid())
+  name         String
+  apiKeyHash   String     @unique
+  apiKeyPrefix String
+  createdAt    DateTime   @default(now())
+  endpoints    Endpoint[]
+  events       Event[]
+  deliveries   Delivery[]
+}
+
+model Endpoint {
+  id                  String         @id @default(uuid())
+  tenantId            String
+  tenant              Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  url                 String
+  description         String?
+  secret              String
+  // Empty list means the endpoint receives every event type.
+  eventTypes          String[]
+  status              EndpointStatus @default(ACTIVE)
+  consecutiveFailures Int            @default(0)
+  disabledAt          DateTime?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  deliveries          Delivery[]
+
+  @@index([tenantId, status])
+}
+
+model Event {
+  id             String     @id @default(uuid())
+  tenantId       String
+  tenant         Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  type           String
+  payload        Json
+  idempotencyKey String?
+  createdAt      DateTime   @default(now())
+  deliveries     Delivery[]
+
+  @@unique([tenantId, idempotencyKey])
+  @@index([tenantId, createdAt])
+}
+
+model Delivery {
+  id             String            @id @default(uuid())
+  tenantId       String
+  tenant         Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  eventId        String
+  event          Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  endpointId     String
+  endpoint       Endpoint          @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+  status         DeliveryStatus    @default(PENDING)
+  attemptCount   Int               @default(0)
+  nextAttemptAt  DateTime?
+  lastStatusCode Int?
+  lastError      String?
+  completedAt    DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  attempts       DeliveryAttempt[]
+
+  @@unique([eventId, endpointId])
+  @@index([tenantId, status, createdAt])
+}
+
+model DeliveryAttempt {
+  id            String   @id @default(uuid())
+  deliveryId    String
+  delivery      Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  attemptNumber Int
+  statusCode    Int?
+  durationMs    Int
+  error         String?
+  responseBody  String?
+  createdAt     DateTime @default(now())
+
+  @@index([deliveryId, attemptNumber])
+  @@index([createdAt])
+}
