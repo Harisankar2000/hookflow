@@ -10,7 +10,8 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "test": "jest --runInBand --forceExit",
-    "receiver": "node scripts/receiver.mjs"
+    "receiver": "node scripts/receiver.mjs",
+    "demo": "node scripts/demo.mjs"
   },
   "dependencies": {
     "@fastify/static": "^8.0.0",
@@ -39,10 +40,16 @@
     "typescript": "^5.7.0"
   },
   "jest": {
-    "moduleFileExtensions": ["js", "json", "ts"],
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
     "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
-    "transform": { "^.+\\.ts$": "ts-jest" },
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
     "testEnvironment": "node",
     "testTimeout": 30000
   }

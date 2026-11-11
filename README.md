@@ -49,6 +49,18 @@ To watch retries, run the demo receiver with a failure rate and point an endpoin
 FAIL_RATE=0.5 npm run receiver
 ```
 
+### Demo data
+
+With the API running, one command fills the dashboard with a realistic workload:
+
+```bash
+npm run demo
+```
+
+It creates an "Acme Commerce" tenant with eight endpoints (orders, payments, inventory, email, analytics, fraud screening, Slack alerts and a legacy CRM), starts local receivers that behave like real services (healthy, slow, flaky, rate-limited and down), publishes 60 commerce events and then one more every eight seconds. You will see retries succeed, deliveries land in the dead letter queue, and the circuit breaker disable the CRM endpoint. The tenant's API key is written to `apps/api/.demo-tenant.json`; paste it into the dashboard's **Settings** tab.
+
+### Manual setup
+
 In the dashboard, open **Settings**, create a tenant with the admin token from `apps/api/.env`, then add an endpoint and send a test event.
 
 ## API

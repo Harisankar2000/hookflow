@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "description": "Webhook management and delivery platform",
-  "workspaces": ["apps/*"],
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
     "infra": "docker compose up -d",
     "infra:down": "docker compose down",
@@ -12,6 +14,7 @@
     "dev:web": "npm run dev -w @hookflow/web",
     "receiver": "npm run receiver -w @hookflow/api",
     "build": "npm run build -w @hookflow/api && npm run build -w @hookflow/web",
-    "test": "npm test -w @hookflow/api"
+    "test": "npm test -w @hookflow/api",
+    "demo": "npm run demo -w @hookflow/api"
   }
 }
